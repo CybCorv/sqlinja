@@ -22,6 +22,10 @@ class AbstractConfig:
         pass
 
     @abstractmethod
-    def get_supp_compare(self, value: int, max: int) -> str:
+    def get_supp_compare(self, value: int, min: int, max: int) -> str:
         """Generate superior comparator for this database"""
         pass
+
+    def wrap_request(self, request: str) -> str:
+        """Normalize a NULL result of the request to an empty string for this database"""
+        return request

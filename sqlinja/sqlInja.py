@@ -31,6 +31,7 @@ class SqlInja:
         self.__current_injection_char: int = config.start_index
         self.__execute_request: Callable[[str, int], bool] = execute_request
 
+    @staticmethod
     def string_to_candidates(to_add: str) -> list[int]:
         candidates: list[int] = []
         for char in to_add:
@@ -41,7 +42,7 @@ class SqlInja:
         self, 
         candidates: list[int] = [], 
         start_with: list[int] = [], 
-        template: Template = None
+        template: Template | None = None
     ) -> None:
         """Init for a new payload"""
         self.__start_with = start_with
@@ -154,7 +155,7 @@ class SqlInja:
 
     def check(
         self,
-        request: str = None,
+        request: str,
         out_of_range_value: int = 9999999,
     ) -> bool:
         """test if the current configuration is a valid injection"""
@@ -183,7 +184,8 @@ class SqlInja:
 
     def extract_cell(self, sub_request: str) -> Generator[int, None, None]:
         """Extract value (base10) of each item in a cell"""
-        while True:        
+        sub_request = self.__config.wrap_request(sub_request)
+        while True:
             new_item = self.extract_val(sub_request)
             if(new_item == self.__config.end_char):
                 break
@@ -207,7 +209,7 @@ class SqlInja:
             if not self.check(request):
                 break
 
-            result = self.extract_cell(request)
+            result = [*self.extract_cell(request)]
             yield result
             index += 1
             last_result = [*last_result]
