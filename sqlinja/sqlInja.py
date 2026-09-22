@@ -258,6 +258,8 @@ class SqlInja:
             current_index = self.__config.start_index
 
         search_context = SearchContext(self.__config, candidates)
+        if not search_context.candidate_set.candidates:
+            raise ValueError("candidates must not be empty")
         return chr(self.__resolve(
             search_context.new_strategy,
             self.__char_code_expr(sub_request, current_index),
