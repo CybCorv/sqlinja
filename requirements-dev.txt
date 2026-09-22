@@ -1,6 +1,10 @@
-# Dev-only dependencies for tests/test_mysql_docker.py and
-# tests/test_mssql_docker.py. The library itself has zero dependencies;
-# these are only needed to run the dialect tests against real MySQL/MSSQL
-# instances (see docker run commands in those files' docstrings).
+# Dev-only dependencies. The library itself has zero dependencies.
+
+# Drivers for tests/test_mysql_docker.py and tests/test_mssql_docker.py,
+# needed only to run the dialect tests against real MySQL/MSSQL instances
+# (see docker run commands in those files' docstrings).
 mysql-connector-python
 pymssql
+
+# Stubs for the examples, which mypy type-checks along with the package.
+types-requests
