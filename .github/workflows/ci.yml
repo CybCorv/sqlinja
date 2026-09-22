@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  # Manual runs from the Actions tab, on any branch.
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # sqlinja uses PEP 604 unions in annotations and typing.Protocol:
+        # 3.10 is the floor.
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # The library itself has zero runtime dependencies, and the MySQL/MSSQL
+      # integration tests self-skip when their driver or server is missing --
+      # so the suite runs as-is, without installing requirements-dev.txt.
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+  typecheck:
+    name: Type check (mypy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # the drivers' stubs are needed to type-check the docker tests
+      - name: Install mypy
+        run: pip install mypy -r requirements-dev.txt
+
+      - name: Run mypy
+        run: mypy .
