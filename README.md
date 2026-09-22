@@ -154,7 +154,7 @@ print("pass for 'admin' : ", "".join(result))
 `max_length` (default `255`) guards both, differently: `extract_until_end_char()`
 raises `RuntimeError` if it reads that many characters without meeting
 `end_char`, while `extract_by_length()` uses it as the upper bound of the length
-search, silently truncating past it. Raise it for long fields.
+search and raises `ValueError` if the real length is greater. Raise it for long fields.
 
 `start_with` resumes from what is already known, e.g. after an interrupted run:
 
