@@ -301,7 +301,7 @@ class ExtractColumnTestCase(SqliteInjectionTestCase):
         ]
         self.assertEqual(users, ["soham", "admin", "guest"])
 
-    def test_extract_column_survive_deferred_consumption(self):
+    def test_extract_column_survives_deferred_consumption(self):
         # collecting extract_column()'s row generators with list() before
         # reading them must not resolve every row against the last request
         rows = list(
