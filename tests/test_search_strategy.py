@@ -157,6 +157,9 @@ class SearchContextTestCase(unittest.TestCase):
         self.assertEqual(context.start_with, [ord("A")])
 
     def test_new_strategy_returns_a_fresh_instance_each_call(self):
+        # __resolve() calls new_strategy() again on every retry attempt; a
+        # reused instance would replay an already-converged search instead
+        # of starting over
         context = SearchContext(self.config, candidates={ord("A"), ord("B")})
         context.advance_to_next_char()
         index_before = context.current_index
